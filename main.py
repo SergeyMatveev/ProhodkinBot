@@ -46,7 +46,6 @@ def main() -> None:
     app = ApplicationBuilder().token(BOT_TOKEN).build()
 
     app.add_handler(start_handler)
-    app.add_handler(stop_handler)
 
     app.add_handler(buy_conv_handler)
     app.add_handler(help_conv_handler)

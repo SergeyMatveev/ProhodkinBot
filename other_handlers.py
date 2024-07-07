@@ -26,8 +26,6 @@ async def stop_all(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     await update.message.reply_text(STOP_MESSAGE)
     return ConversationHandler.END
 
-stop_handler = CommandHandler('stop', stop_all)
-
 
 async def error_handler(update: object, context: ContextTypes.DEFAULT_TYPE):
     try:
