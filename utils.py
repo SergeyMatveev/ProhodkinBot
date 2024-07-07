@@ -91,3 +91,4 @@ async def send_order_details(context: ContextTypes.DEFAULT_TYPE, order_number: i
     if chat_id != PRODUCTION_CHAT_ID:
         await context.bot.send_message(chat_id=chat_id,
                                        text=f"Юзернейм: @{user_data['username']}\nКонтакт: {user_data['contact']}\n")
+

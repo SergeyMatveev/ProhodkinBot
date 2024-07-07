@@ -78,3 +78,4 @@ async def handle_qr_code(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(QR_CODE_ORDER_NOT_FOUND_MESSAGE)
 
 qr_code_handler = MessageHandler(filters.PHOTO, handle_qr_code)
+
