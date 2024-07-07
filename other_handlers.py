@@ -17,11 +17,16 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await update.message.reply_text(START_MESSAGE)
 
 
+start_handler = CommandHandler('start', start)
+
+
 async def stop_all(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     logging.info(f"Stopping process for user {update.message.from_user.username}, UserID {update.message.from_user.id}")
     context.user_data.clear()
     await update.message.reply_text(STOP_MESSAGE)
     return ConversationHandler.END
+
+stop_handler = CommandHandler('stop', stop_all)
 
 
 async def error_handler(update: object, context: ContextTypes.DEFAULT_TYPE):
@@ -29,9 +34,6 @@ async def error_handler(update: object, context: ContextTypes.DEFAULT_TYPE):
         logging.error(msg="Exception while handling an update:", exc_info=context.error)
     except Exception as e:
         logging.error("Error in error handler: %s", e)
-
-
-start_handler = CommandHandler('start', start)
 
 
 async def handle_qr_code(update: Update, context: ContextTypes.DEFAULT_TYPE):

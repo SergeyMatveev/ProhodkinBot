@@ -7,7 +7,8 @@ from telegram.ext import ApplicationBuilder
 from buy_handler import buy_conv_handler
 from config import BOT_TOKEN
 from help_handler import help_conv_handler
-from other_handlers import start_handler, error_handler, qr_code_handler
+from other_handlers import start_handler, error_handler, qr_code_handler, stop_handler
+from utils import make_backup_handler
 
 
 def setup_logging():
@@ -45,10 +46,12 @@ def main() -> None:
     app = ApplicationBuilder().token(BOT_TOKEN).build()
 
     app.add_handler(start_handler)
+    app.add_handler(stop_handler)
 
     app.add_handler(buy_conv_handler)
     app.add_handler(help_conv_handler)
     app.add_handler(qr_code_handler)
+    app.add_handler(make_backup_handler)
 
     app.add_error_handler(error_handler)
 

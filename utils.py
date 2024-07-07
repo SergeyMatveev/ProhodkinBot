@@ -3,7 +3,7 @@ import os
 import json
 from datetime import datetime
 from telegram import Update
-from telegram.ext import ContextTypes
+from telegram.ext import ContextTypes, CommandHandler
 
 from config import ORDER_CHAT_ID, PRODUCTION_CHAT_ID, ORDERS_DIR
 
@@ -92,3 +92,13 @@ async def send_order_details(context: ContextTypes.DEFAULT_TYPE, order_number: i
         await context.bot.send_message(chat_id=chat_id,
                                        text=f"Юзернейм: @{user_data['username']}\nКонтакт: {user_data['contact']}\n")
 
+
+async def send_orders_file(context: ContextTypes.DEFAULT_TYPE):
+    orders_file = 'orders.txt'
+    if os.path.exists(orders_file):
+        with open(orders_file, 'rb') as file:
+            await context.bot.send_document(chat_id=ORDER_CHAT_ID, document=file, filename='orders.txt')
+    else:
+        logging.error("Orders file does not exist.")
+
+make_backup_handler = CommandHandler('make_backup', send_orders_file)
