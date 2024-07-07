@@ -7,7 +7,7 @@ from telegram.ext import ApplicationBuilder
 from buy_handler import buy_conv_handler
 from config import BOT_TOKEN
 from help_handler import help_conv_handler
-from other_handlers import start_handler, error_handler, qr_code_handler, stop_handler
+from other_handlers import start_handler, error_handler, qr_code_handler
 from utils import make_backup_handler
 
 
