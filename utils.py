@@ -93,8 +93,30 @@ async def send_order_details(context: ContextTypes.DEFAULT_TYPE, order_number: i
                                        text=f"Юзернейм: @{user_data['username']}\nКонтакт: {user_data['contact']}\n")
 
 
-async def send_orders_file(context: ContextTypes.DEFAULT_TYPE):
+async def send_orders_file(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    logs_directory = 'logs'
     orders_file = 'orders.txt'
+    backup_message = "Сохраню бекап файлы на всякий случай"
+
+    # Send backup message
+    await context.bot.send_message(chat_id=ORDER_CHAT_ID, text=backup_message)
+
+    # Find the latest log file
+    latest_log_file = None
+    if os.path.exists(logs_directory):
+        log_files = [f for f in os.listdir(logs_directory) if f.endswith('.log')]
+        if log_files:
+            latest_log_file = max(log_files, key=lambda x: datetime.strptime(x, '%Y-%m-%d_%H-%M-%S.log'))
+
+    # Send the latest log file if it exists
+    if latest_log_file:
+        latest_log_path = os.path.join(logs_directory, latest_log_file)
+        with open(latest_log_path, 'rb') as log_file:
+            await context.bot.send_document(chat_id=ORDER_CHAT_ID, document=log_file, filename=latest_log_file)
+    else:
+        logging.error("No log files found.")
+
+    # Send the orders file if it exists
     if os.path.exists(orders_file):
         with open(orders_file, 'rb') as file:
             await context.bot.send_document(chat_id=ORDER_CHAT_ID, document=file, filename='orders.txt')
