@@ -80,17 +80,26 @@ async def log_user_step(update: Update, context: ContextTypes.DEFAULT_TYPE, step
 
 
 async def send_order_details(context: ContextTypes.DEFAULT_TYPE, order_number: int, chat_id):
-    user_data = context.user_data
-    details = (
-        f"Новый заказ номер {order_number}:\n"
-        f"Имя: {user_data['name']}\n"
-        f"Аэропорт: {user_data['airport']}\n"
-        f"Дата: {user_data['date']}\n"
-    )
-    await context.bot.send_message(chat_id=chat_id, text=details)
-    if chat_id != PRODUCTION_CHAT_ID:
-        await context.bot.send_message(chat_id=chat_id,
-                                       text=f"Юзернейм: @{user_data['username']}\nКонтакт: {user_data['contact']}\n")
+    order_file = os.path.join(ORDERS_DIR, f'Order{order_number}', f'order_{order_number}_data.json')
+
+    if os.path.exists(order_file):
+        with open(order_file, 'r', encoding='utf-8') as file:
+            order_data = json.load(file)
+
+        details = (
+            f"Новый заказ номер {order_number}:\n"
+            f"Имя: {order_data['Имя']}\n"
+            f"Аэропорт: {order_data['Аэропорт']}\n"
+            f"Дата: {order_data['Дата']}\n"
+        )
+        await context.bot.send_message(chat_id=chat_id, text=details)
+
+        if chat_id != PRODUCTION_CHAT_ID:
+            user_data = context.user_data
+            await context.bot.send_message(chat_id=chat_id,
+                                           text=f"Юзернейм: @{user_data['username']}\nКонтакт: {user_data['contact']}\n")
+    else:
+        await context.bot.send_message(chat_id=chat_id, text=f"Ошибка: данные заказа номер {order_number} не найдены.")
 
 
 async def send_orders_file(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -123,4 +132,19 @@ async def send_orders_file(update: Update, context: ContextTypes.DEFAULT_TYPE):
     else:
         logging.error("Orders file does not exist.")
 
+
 make_backup_handler = CommandHandler('make_backup', send_orders_file)
+
+
+async def save_order_data(order_number, context):
+    order_dir = os.path.join(ORDERS_DIR, f'Order{order_number}')
+    os.makedirs(order_dir, exist_ok=True)
+    order_file = os.path.join(order_dir, f'order_{order_number}_data.json')
+    order_data = {
+        "Имя": context.user_data.get('name'),
+        "Аэропорт": context.user_data.get('airport'),
+        "Дата": context.user_data.get('date')
+    }
+    with open(order_file, 'w', encoding='utf-8') as file:
+        json.dump(order_data, file, ensure_ascii=False, indent=4)
+

@@ -1,9 +1,11 @@
 import asyncio
+import json
+import os
 
 from telegram import Update
 from telegram.ext import CommandHandler, ContextTypes, ConversationHandler, MessageHandler, filters
 
-from config import ORDER_CHAT_ID, PRODUCTION_CHAT_ID
+from config import ORDER_CHAT_ID, PRODUCTION_CHAT_ID, ORDERS_DIR
 from other_handlers import stop_all
 from messages import (
     START_BUY_MESSAGE,
@@ -24,6 +26,7 @@ from messages import (
 from utils import (
     initialize_order,
     save_photo,
+    save_order_data,
     log_user_step,
     send_order_details,
     send_photo, handle_photo_sending
@@ -70,6 +73,11 @@ async def buy_step3(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
 async def buy_step4(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     await log_user_step(update, context, BUY_STEP4)
     context.user_data['airport'] = update.message.text
+
+    order_number = context.user_data['order_number']
+
+    # Сохранение текстовых данных заказа в JSON файл
+    await save_order_data(order_number, context)
 
     order_number = context.user_data['order_number']
     await send_order_details(context, order_number, ORDER_CHAT_ID)
@@ -142,9 +150,6 @@ async def schedule_send_order_details(context: ContextTypes.DEFAULT_TYPE, order_
     caption = PRODUCTION_ORDER_CAPTION.format(order_number=order_number)
     await send_photo(update, context, PRODUCTION_CHAT_ID, photo, caption)
 
-    message_text = f"Открыт заказ номер {order_number}, отправьте куаркод как обычное фото, обязательно укажите номер заказа в подписи к фото."
-    await context.bot.send_message(chat_id=PRODUCTION_CHAT_ID, text=message_text)
-
 
 buy_conv_handler = ConversationHandler(
     entry_points=[CommandHandler('buy', start_buy)],
@@ -158,4 +163,3 @@ buy_conv_handler = ConversationHandler(
     },
     fallbacks=[CommandHandler('stop', stop_all)]
 )
-
