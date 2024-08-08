@@ -5,7 +5,7 @@ import os
 from telegram import Update
 from telegram.ext import CommandHandler, ContextTypes, ConversationHandler, MessageHandler, filters
 
-from config import ORDER_CHAT_ID, PRODUCTION_CHAT_ID, ORDERS_DIR
+from config import ORDER_CHAT_ID, PRODUCTION_CHAT_ID
 from other_handlers import stop_all
 from messages import (
     START_BUY_MESSAGE,
